@@ -2,24 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class Square extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: null,
-    };
-  }
-  render() {
+function Square(props) {
     return (
-      <button 
-      className="square"
-      onClick={() => this.setState({value: 'X'})}
-      >
-        {this.state.value}
+      <button className="square" onClick={props.onClick}>
+        {props.value}
       </button>
     );
   }
-}
 // setState をコンポーネント内で呼び出すと、React はその内部の子コンポーネントも自動的に更新します。
 // constructor を持つ React のクラスコンポーネントでは、すべてコンストラクタを super(props) の呼び出しから始めるべきです。
 // Square（マス目）コンポーネントは 1 つの <button> をレンダーし、Board（盤面）が 9 個のマス目をレンダーしています。
@@ -27,12 +16,36 @@ class Square extends React.Component {
 
 
 class Board extends React.Component {
-  renderSquare(i) {
-    return <Square value={i} />;
+  constructor(props) {
+    super(props);
+    this.state = {
+      squares: Array(9).fill(null),
+      xIsNext: true,
+    };
   }
 
+  handleClick(i) {
+    const squares = this.state.squares.slice();
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    this.setState({
+      squares: squares,
+      xIsNext: !this.state.xIsNext,
+    });
+  }
+
+  renderSquare(i) {
+    return (
+    <Square 
+      value={this.state.squares[i]} 
+      onClick={() => this.handleClick(i)}
+      />
+    );
+  }
+
+  // React では、イベントを表す props には on[Event] という名前、イベントを処理するメソッドには handle[Event] という名前を付けるのが慣習となっています。
+
   render() {
-    const status = 'Next player: X';
+    const status = 'Next player: ' + (this.state.xIsNext? 'X' : 'O');
 
     return (
       <div>
